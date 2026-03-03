@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package agents;
+
+option go_package = "agentspb";
+
+// ----------------------------
+// Competitor
+// ----------------------------
+message CompetitorSearchRequest {
+  string company = 1;
+  string market  = 2;
+  int32  topk    = 3;
+  string profiles_path = 4;  // 다음 단계를 위한 컨텍스트
+  string question = 5;        // 다음 단계를 위한 컨텍스트
+}
+
+message CompetitorSearchResponse {
+  bool ok        = 1;
+  string raw_en  = 2;   // 영어 원문 (Formatter에 넘길 값)
+  string error   = 3;
+}
+
+
+// ----------------------------
+// Customer
+// ----------------------------
+message CustomerProfileRequest {
+  string profiles_path = 1;
+  string question      = 2;
+  string competitor    = 3;  // 다음 단계를 위한 컨텍스트 (경쟁사 분석 결과)
+}
+
+message CustomerProfileResponse {
+  bool ok      = 1;
+  string value = 2; // 한국어 요약(기존 summary)
+  string error = 3;
+}
+
+
+// ----------------------------
+// Feature Suggestion
+// ----------------------------
+message FeatureProposeRequest {
+  string competitor = 1; // KO 요약 또는 EN 원문
+  string customer   = 2; // KO 요약
+  string company    = 3; // 다음 단계를 위한 컨텍스트
+  string market     = 4; // 다음 단계를 위한 컨텍스트
+  string question   = 5; // 다음 단계를 위한 컨텍스트
+}
+
+message FeatureProposeResponse {
+  bool ok      = 1;
+  string value = 2; // 기능 제안 텍스트
+  string error = 3;
+}
+
+
+// ----------------------------
+// Revenue Model
+// ----------------------------
+message RevenueModelRequest {
+  string features = 1;
+  string company  = 2;  // 다음 단계를 위한 컨텍스트
+  string market   = 3;  // 다음 단계를 위한 컨텍스트
+  string question = 4;  // 다음 단계를 위한 컨텍스트
+  string customer = 5;  // 다음 단계를 위한 컨텍스트
+  string competitor = 6; // 다음 단계를 위한 컨텍스트
+  string out_dir  = 7;  // 다음 단계를 위한 컨텍스트
+  string filename = 8;  // 다음 단계를 위한 컨텍스트
+}
+
+message RevenueModelResponse {
+  bool ok      = 1;
+  string value = 2; // 수익모델 텍스트
+  string error = 3;
+}
+
+
+// ----------------------------
+// Formatter (EN → KO)
+// ----------------------------
+message FormatKoRequest {
+  string text = 1;  // 영어 또는 혼합 텍스트
+  string profiles_path = 2;  // 다음 단계를 위한 컨텍스트
+  string question = 3;       // 다음 단계를 위한 컨텍스트
+}
+
+message FormatKoResponse {
+  bool ok      = 1;
+  string value = 2; // 한국어 요약
+  string error = 3;
+}
+
+
+// ----------------------------
+// Writer (Markdown storage)
+// ----------------------------
+message PersistMdRequest {
+  string company    = 1;
+  string market     = 2;
+  string question   = 3;
+  string customer   = 4;
+  string features   = 5;
+  string revenue    = 6;
+  string competitor = 7;
+  string out_dir    = 8;
+  string filename   = 9;
+}
+
+message PersistMdResponse {
+  bool ok      = 1;
+  string path  = 2;
+  string error = 3;
+}
+
+
+// ----------------------------
+// Services
+// ----------------------------
+service CompetitorService {
+  rpc Search(CompetitorSearchRequest) returns (CompetitorSearchResponse);
+}
+
+service CustomerService {
+  rpc Profile(CustomerProfileRequest) returns (CustomerProfileResponse);
+}
+
+service FeatureService {
+  rpc Propose(FeatureProposeRequest) returns (FeatureProposeResponse);
+}
+
+service RevenueService {
+  rpc Model(RevenueModelRequest) returns (RevenueModelResponse);
+}
+
+service FormatterService {
+  rpc FormatKo(FormatKoRequest) returns (FormatKoResponse);
+}
+
+service WriterService {
+  rpc PersistMd(PersistMdRequest) returns (PersistMdResponse);
+}

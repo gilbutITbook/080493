@@ -1,0 +1,14 @@
+[project]
+name = "18-generate-proposal"
+version = "0.1.0"
+description = "Azure AI Foundry 제안서 생성 시스템 - gRPC 기반 AI 에이전트 오케스트레이션"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "grpcio>=1.60.0",
+    "grpcio-tools>=1.60.0", 
+    "protobuf>=5.29.0",
+    "openai>=1.0.0",
+    "mcp>=0.1.0",
+    "fastmcp>=0.1.0"
+]
