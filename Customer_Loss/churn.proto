@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package churn;
+
+import "google/protobuf/struct.proto";
+
+//////////////////////////////
+// Feature Engineer (6101)
+//////////////////////////////
+service FeatureService {
+  rpc FeaturesOne(FeaturesOneReq) returns (Json);
+  rpc FeaturesBatch(FeaturesBatchReq) returns (JsonList);
+}
+
+message FeaturesOneReq {
+  google.protobuf.Struct row = 1;
+}
+
+message FeaturesBatchReq {
+  repeated google.protobuf.Struct rows = 1;
+}
+
+//////////////////////////////
+// Predictor (6102)
+//////////////////////////////
+service PredictorService {
+  rpc PredictOne(PredictOneReq) returns (Json);
+  rpc PredictFromRow(PredictFromRowReq) returns (Json);  // A2A: customer_row를 받아 내부적으로 Feature 호출
+}
+
+message PredictOneReq {
+  google.protobuf.Struct feature = 1;
+}
+
+message PredictFromRowReq {
+  google.protobuf.Struct customer_row = 1;
+}
+
+//////////////////////////////
+// Explainer (6103)
+//////////////////////////////
+service ExplainerService {
+  rpc ExplainFromRow(ExplainFromRowReq) returns (Text);  // A2A: customer_row를 받아 내부적으로 Feature와 Predictor 호출
+}
+
+message ExplainFromRowReq {
+  google.protobuf.Struct customer_row = 1;
+}
+
+//////////////////////////////
+// Recommenders (6104–6106)
+//////////////////////////////
+service CollaborativeRecommendService {
+  rpc RecommendCollaborative(RecommendReq) returns (JsonList);
+}
+
+service ContentRecommendService {
+  rpc RecommendContent(RecommendReq) returns (JsonList);
+}
+
+service HybridRecommendService {
+  rpc RecommendHybridFromData(RecommendFromDataReq) returns (JsonList);  // A2A: data_path를 받아 내부적으로 Feature 호출
+}
+
+//////////////////////////////
+// Similar Customers (6107)
+//////////////////////////////
+service SimilarService {
+  rpc SimilarCustomersFromData(SimilarFromDataReq) returns (JsonList);  // A2A: data_path를 받아 내부적으로 Feature 호출
+}
+
+//////////////////////////////
+// Common
+//////////////////////////////
+message RecommendReq {
+  string customer_id = 1;
+  repeated google.protobuf.Struct all_features = 2;
+  int32 top_n = 3;
+}
+
+message Json {
+  google.protobuf.Struct data = 1;
+}
+
+message JsonList {
+  repeated google.protobuf.Struct items = 1;
+}
+
+message Text {
+  string value = 1;
+}
+
+message RecommendFromDataReq {
+  string customer_id = 1;
+  string data_path = 2;
+  int32 top_n = 3;
+}
+
+message SimilarFromDataReq {
+  string customer_id = 1;
+  string data_path = 2;
+  int32 top_n = 3;
+}

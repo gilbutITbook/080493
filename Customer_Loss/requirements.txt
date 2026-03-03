@@ -1,0 +1,14 @@
+# Customer Loss 프로젝트 의존성 패키지
+
+# gRPC 및 Protocol Buffers
+grpcio
+grpcio-tools
+
+
+# MCP (Model Context Protocol) 서버
+mcp
+
+# OpenAI API (LLM 기능용, 선택사항)
+# LLM 기능을 사용하지 않으면 설치하지 않아도 됩니다
+openai
+
