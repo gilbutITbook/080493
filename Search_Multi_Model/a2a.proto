@@ -1,0 +1,50 @@
+// a2a.proto
+syntax = "proto3";
+
+package a2a;
+
+// 공통 응답 메타데이터(JSON 문자열)
+message AgentReply {
+  string text = 1;       // 에이전트 출력 텍스트
+  string meta_json = 2;  // 메타데이터(JSON)
+}
+
+// Draft 에이전트
+message DraftRequest {
+  string task = 1;
+}
+
+// Critic 에이전트
+message CriticRequest {
+  string task = 1;
+  string draft = 2;
+}
+
+// Scoring 에이전트
+message ScoringRequest {
+  string task = 1;
+  map<string, string> candidates = 2;
+}
+
+// Synthesizer 에이전트
+message SynthRequest {
+  string task = 1;
+  string best_candidate = 2;
+  repeated string notes = 3;
+}
+
+service DraftService {
+  rpc RunDraft (DraftRequest) returns (AgentReply);
+}
+
+service CriticService {
+  rpc RunCritic (CriticRequest) returns (AgentReply);
+}
+
+service ScoringService {
+  rpc RunScoring (ScoringRequest) returns (AgentReply);
+}
+
+service SynthService {
+  rpc RunSynth (SynthRequest) returns (AgentReply);
+}
