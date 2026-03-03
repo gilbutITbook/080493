@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package agents;
+
+service RefinerService {
+  rpc Process (RefineRequest) returns (FinalizeResponse);
+}
+
+service ResponderService {
+  rpc Answer (AnswerRequest) returns (AnswerResponse);
+  rpc Revise (ReviseRequest) returns (AnswerResponse);
+}
+
+service FactCheckerService {
+  rpc Check (FactCheckRequest) returns (FactCheckResponse);
+}
+
+service HalluService {
+  rpc Analyze (HalluRequest) returns (HalluResponse);
+  rpc AnalyzeAndFinalize (HalluRequest) returns (FinalizeResponse);
+}
+
+service FinalizerService {
+  rpc Finalize (FinalizeRequest) returns (FinalizeResponse);
+}
+
+message RefineRequest {
+  string user_question = 1;
+}
+
+message AnswerRequest {
+  string refined = 1;
+}
+
+message AnswerResponse {
+  string answer = 1;
+}
+
+message ReviseRequest {
+  string answer = 1;
+  string reasons = 2;
+}
+
+message FactCheckRequest {
+  string refined = 1;
+}
+
+message Fact {
+  string content = 1;
+  string url = 2;
+}
+
+message FactCheckResponse {
+  repeated Fact facts = 1;
+  repeated string sources = 2;
+  string verification_status = 3;
+}
+
+message HalluRequest {
+  string answer = 1;
+  FactCheckResponse fact_data = 2;
+}
+
+message HalluResponse {
+  string overall_risk = 1;
+  string revised_answer = 2;
+  string fact_status = 3;
+  string hallucination_level = 4;
+}
+
+message FinalizeRequest {
+  string answer = 1;
+  HalluResponse hallu = 2;
+  FactCheckResponse fact_data = 3;
+}
+
+message FinalizeResponse {
+  string final_answer = 1;
+}
