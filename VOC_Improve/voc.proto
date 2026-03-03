@@ -1,0 +1,139 @@
+syntax = "proto3";
+package a2a;
+
+service Interpreter {
+  rpc ParseQuestion(ParseQuestionReq) returns (ParseQuestionRes);
+}
+
+service Retriever {
+  rpc Retrieve(RetrieveReq) returns (RetrieveRes);
+}
+
+service Summarizer {
+  rpc MakeCandidates(SummarizeReq) returns (SummarizeRes);
+  rpc Refine(RefineReq) returns (RefineRes);
+  rpc RunPipeline(RunPipelineReq) returns (RunPipelineRes);
+}
+
+service Evaluator {
+  rpc Evaluate(EvaluateReq) returns (EvaluateRes);
+}
+
+service Critic {
+  rpc Review(ReviewReq) returns (ReviewRes);
+}
+
+service Improver {
+  rpc Improve(PolicyReq) returns (PolicyRes);
+  rpc Refine(RefinePolicyReq) returns (PolicyRes);
+  rpc RunPolicyPipeline(RunPolicyPipelineReq) returns (RunPolicyPipelineRes);
+}
+
+// ===== Messages =====
+message ParseQuestionReq {
+  string question    = 1;
+  string default_csv = 2;
+}
+
+message ParseQuestionRes {
+  string task          = 1;   // "summary" | "policy" | "both"
+  repeated string filters = 2;
+  int32 max_items      = 3;
+  string csv_path      = 4;
+}
+
+// ---------- Retriever ----------
+message RetrieveReq {
+  string csv_path         = 1;  // VOC CSV 경로
+  repeated string filters = 2;  // 검색 키워드
+  int32 max_items         = 3;  // 최대 건수 (0 이하면 서버 기본값 사용)
+}
+
+message RetrieveRes {
+  repeated string texts = 1;
+}
+
+// ---------- Summarizer ----------
+message SummarizeReq {
+  repeated string texts = 1;
+  int32 max_items       = 2;
+  int32 n               = 3;
+}
+
+message SummarizeRes {
+  map<string, string> candidates = 1; // S0,S1,...
+}
+
+message RefineReq {
+  string draft     = 1;
+  string edits_json = 2; // JSON array of edits
+}
+
+message RefineRes {
+  string text = 1;
+}
+
+message RunPipelineReq {
+  string csv_path         = 1;
+  repeated string filters = 2;
+  int32 max_items         = 3;
+  string task             = 4; // "summary" | "policy" | "both"
+}
+
+message RunPipelineRes {
+  bool ok                     = 1;
+  string summary              = 2;
+  string policy               = 6; // 정책 개선안 (task가 "policy" 또는 "both"일 때)
+  string eval_json            = 3;
+  string summary_critic_json  = 4;
+  string trace                = 5;
+}
+
+// ---------- Evaluator ----------
+message EvaluateReq {
+  string task = 1;
+  map<string, string> candidates = 2;
+}
+
+message EvaluateRes {
+  string winner      = 1;
+  string scores_json = 2;
+}
+
+// ---------- Critic ----------
+message ReviewReq {
+  string doc  = 1;
+  string role = 2; // "summary" | "policy"
+}
+
+message ReviewRes {
+  bool need_refine      = 1;
+  repeated string edits = 2;
+  bool ask_more_samples = 3;
+  string policy         = 4; // role="policy"일 때 최종 정책 개선안 포함
+  string summary        = 5; // role="summary"일 때 최종 요약 포함 (선택적)
+}
+
+// ---------- Improver ----------
+message PolicyReq {
+  string summary = 1;
+}
+
+message PolicyRes {
+  string policy = 1;
+}
+
+message RefinePolicyReq {
+  string policy     = 1;
+  string edits_json = 2;
+}
+
+message RunPolicyPipelineReq {
+  string summary = 1;
+}
+
+message RunPolicyPipelineRes {
+  bool ok        = 1;
+  string policy  = 2;
+  string trace   = 3;
+}
