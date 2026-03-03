@@ -1,0 +1,31 @@
+# RFP Generate 프로젝트 의존성
+
+# PDF 처리
+PyMuPDF>=1.23.0
+
+# OpenAI API
+openai>=1.0.0
+
+# Excel 파일 생성
+pandas>=2.0.0
+openpyxl>=3.1.0  # pandas의 Excel 엔진
+
+# gRPC 통신
+grpcio>=1.60.0
+grpcio-tools>=1.60.0  # protobuf 컴파일용
+
+# MCP 서버
+mcp>=1.0.0
+
+# Protobuf (grpcio와 함께 설치되지만 명시적으로 포함)
+protobuf>=4.25.0
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,28 @@
+// Protocol Buffers 정의 파일
+// gRPC 서비스와 메시지 타입 정의
+syntax = "proto3";
+
+package rfp;
+
+// RFP용 공통 gRPC 서비스
+// - topic: "outline.extract", "compliance.build" 등
+// - payload_json: JSON 직렬화된 요청
+// - result_json: JSON 직렬화된 응답
+service Rfp {
+  // 단일 RPC 메서드: 모든 요청을 이 메서드로 처리
+  // topic으로 요청 유형을 구분
+  rpc Call (RfpRequest) returns (RfpResponse);
+}
+
+// 요청 메시지
+message RfpRequest {
+  string topic        = 1;  // 요청 토픽 (예: "outline.extract", "compliance.build")
+  string payload_json = 2;  // JSON 직렬화된 요청 페이로드
+}
+
+// 응답 메시지
+message RfpResponse {
+  bool   ok          = 1;  // 요청 성공 여부
+  string error       = 2;  // 에러 메시지 (ok가 false일 때)
+  string result_json = 3;  // JSON 직렬화된 응답 결과 (ok가 true일 때)
+}
